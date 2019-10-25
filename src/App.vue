@@ -1,16 +1,22 @@
 <template>
   <div id="app">
-    <ScrollText text="Sometimes the best way to solve your own problems... Is to help someone else."/>
+    <SyncScrollText>
+      <ScrollText text="Sometimes the best way to solve your own problems... Is to help someone else."/>
+      <ScrollText text="You are technically correct. The best kind of correct."/>
+      <ScrollText text="He is good at everything"/>
+    </SyncScrollText>
   </div>
 </template>
 
 <script>
 import ScrollText from './components/ScrollText.vue'
+import SyncScrollText from './components/SyncScrollText.vue'
 
 export default {
   name: 'app',
   components: {
-    ScrollText
+    ScrollText,
+    SyncScrollText,
   }
 }
 </script>

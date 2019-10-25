@@ -1,29 +1,31 @@
 <template>
   <div class="scroll-text">
     <div ref="scrollBox" class="container margin-transition stopped"><span ref="scrollTextBase" class="base">{{ text }}</span><span ref="scrollTextFollower" class="hidden follower">{{ text }}</span></div>
-    <button v-on:click="startScrolling">test</button>
   </div>
 </template>
 
 <script>
 /* Notes
+* Animating cut off text does not work with transform, transform works on the view layer.
 * CSS animations does not allow for breaks between iterations, you could implement it by adding keyframes with no changes.
 * To restart animation remove/add a pause class or remove/add a class which sets animation: none!important. Going with animationend over animationiterate is more precise.
 
 */
 
-
-let breakTime = 2; // in s
-// let speed = 5; // characters per s
-
 export default {
   name: 'ScrollText',
   props: {
-    text: String,
+    text: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
-
+      textWidth: 0,
+      duration: 5,
+      breakTime: 2000, // in ms
+      pixelPerSecond: 50,
     };
   },
   mounted() {
@@ -36,19 +38,36 @@ export default {
     if (textWidth < containerWidth) {
       return;
     }
-    var follower = this.$refs.scrollTextFollower;
-    follower.classList.remove('hidden');
-
-    // var animationmargin = getComputedStyle(this.$refs.scrollBox).getPropertyValue('--animation-margin'); if this fails we have no var support
-    this.$refs.scrollBox.style.setProperty('--animation-margin', '-' + (textWidth + 20) + 'px');
+    this.textWidth = textWidth;
 
   },
   methods: {
-    startScrolling() {
+    // Passing the parameters to children over a method.
+    startScrolling(breakTime, pixelPerSecond) {
+      if (this.textWidth === 0) {
+        return;
+      }
+      if (breakTime !== undefined) {
+        this.breakTime = breakTime;
+      }
+      if (pixelPerSecond !== undefined) {
+        this.pixelPerSecond = pixelPerSecond;
+      }
+
+      this.duration = this.textWidth / this.pixelPerSecond;
+
+      var follower = this.$refs.scrollTextFollower;
+      follower.classList.remove('hidden');
+
+      this.$refs.scrollBox.style['animation-duration'] = this.duration + 's';
+
+      // var animationmargin = getComputedStyle(this.$refs.scrollBox).getPropertyValue('--animation-margin'); if this fails we have no var support
+      this.$refs.scrollBox.style.setProperty('--animation-margin', '-' + (this.textWidth + 20) + 'px');
+
       this.$refs.scrollBox.classList.remove('stopped');
       this.$refs.scrollBox.addEventListener('animationend', () => {
         this.$refs.scrollBox.classList.add('stopped');
-        setTimeout(this.startScrolling, breakTime * 1000);
+        setTimeout(this.startScrolling, this.breakTime);
       });
     },
     pauseScrolling() {
@@ -72,7 +91,7 @@ function browserCanUseCssVariables() {
   animation: none !important;
 }
 .hidden {
-  display: none;
+  display: none !important;
 }
 .follower {
   margin-left: 20px;
