@@ -97,11 +97,22 @@ function browserCanUseCssVariables() {
   margin-left: 20px;
 }
 .scroll-text {
+  padding-left: 20px;
   --animation-margin: -20px;
 
   white-space: nowrap;
   overflow: hidden;
 }
+.scroll-text::before {
+  background-image: linear-gradient( right,
+          rgba( 255, 255, 255, 0 ) 0%,
+          rgba( 255, 255, 255, 1 ) 100% );
+  content: "\00a0";
+  position: absolute;
+  width: 20px;
+  left: 0px;
+}
+
 .scroll-text span {
   display: inline-block;
 }
