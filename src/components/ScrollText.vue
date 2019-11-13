@@ -1,16 +1,12 @@
 <template>
-  <div class="scroll-text">
-    <div ref="scrollBox" class="container margin-transition stopped"><span ref="scrollTextBase" class="base">{{ text }}</span><span ref="scrollTextFollower" class="hidden follower">{{ text }}</span></div>
+  <div ref="scrollText" class="scroll-text">
+    <div ref="container" class="container stopped">
+      <span ref="first">{{ text }}</span><span ref="second" class="hidden follower">{{ text }}</span>
+    </div>
   </div>
 </template>
 
 <script>
-/* Notes
-* Animating cut off text does not work with transform, transform works on the view layer.
-* CSS animations does not allow for breaks between iterations, you could implement it by adding keyframes with no changes.
-* To restart animation remove/add a pause class or remove/add a class which sets animation: none!important. Going with animationend over animationiterate is more precise.
-
-*/
 
 export default {
   name: 'ScrollText',
@@ -33,16 +29,22 @@ export default {
       alert('Your browser does not support CSS Variables and/or CSS.supports. :-(');
       return;
     }
-    var containerWidth = this.$refs.scrollBox.clientWidth;
-    var textWidth = this.$refs.scrollTextBase.clientWidth;
+    var containerWidth = this.$refs.scrollText.clientWidth;
+    var textWidth = this.$refs.container.clientWidth - 20; // we have to subtract the spacing between
+
     if (textWidth < containerWidth) {
       return;
     }
     this.textWidth = textWidth;
 
+    // Restarting of a CSS animation is done by overwriting the animatino property and then freeing it again for the inherited to trigger
+    this.$refs.container.addEventListener('animationend', () => {
+      this.$refs.container.classList.add('stopped');
+      setTimeout(this.startScrolling, this.breakTime);
+    });
   },
   methods: {
-    // Passing the parameters to children over a method.
+    // The parent (SyncScrollText) calulcates the wait time for the children, and calls this method directly.
     startScrolling(breakTime, pixelPerSecond) {
       if (this.textWidth === 0) {
         return;
@@ -53,28 +55,11 @@ export default {
       if (pixelPerSecond !== undefined) {
         this.pixelPerSecond = pixelPerSecond;
       }
-
       this.duration = this.textWidth / this.pixelPerSecond;
-
-      var follower = this.$refs.scrollTextFollower;
+      var follower = this.$refs.second;
       follower.classList.remove('hidden');
-
-      this.$refs.scrollBox.style['animation-duration'] = this.duration + 's';
-
-      // var animationmargin = getComputedStyle(this.$refs.scrollBox).getPropertyValue('--animation-margin'); if this fails we have no var support
-      this.$refs.scrollBox.style.setProperty('--animation-margin', '-' + (this.textWidth + 20) + 'px');
-
-      this.$refs.scrollBox.classList.remove('stopped');
-      this.$refs.scrollBox.addEventListener('animationend', () => {
-        this.$refs.scrollBox.classList.add('stopped');
-        setTimeout(this.startScrolling, this.breakTime);
-      });
-    },
-    pauseScrolling() {
-
-    },
-    stopScrolling() {
-
+      this.$refs.container.style['animation-duration'] = this.duration + 's';
+      this.$refs.container.classList.remove('stopped');
     },
   }
 }
@@ -87,48 +72,43 @@ function browserCanUseCssVariables() {
 
 <style scoped>
 .stopped {
-  /* animation-play-state: paused !important; */
   animation: none !important;
 }
 .hidden {
   display: none !important;
 }
-.follower {
-  margin-left: 20px;
-}
 .scroll-text {
-  padding-left: 20px;
-  --animation-margin: -20px;
-
+  margin: 0 auto;
   white-space: nowrap;
   overflow: hidden;
+  box-sizing: border-box;
+  padding: 0;
+  display: block;
 }
+.container {
+  display: inline-block;
+  text-indent: 0;
+  overflow: hidden;
+  animation: marquee 5s linear infinite;
+  animation-iteration-count: 1;
+}
+.container span {
+  padding-left: 40px;
+  padding-right: 10px; /* space between spans */
+}
+
 .scroll-text::before {
-  background-image: linear-gradient( right,
-          rgba( 255, 255, 255, 0 ) 0%,
-          rgba( 255, 255, 255, 1 ) 100% );
+  z-index: 1;
+  background-image: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(0,0,0,0) 7%, rgba(0,0,0,0) 93%, rgba(255,255,255,1) 100%);
   content: "\00a0";
   position: absolute;
-  width: 20px;
+  width: 100%;
   left: 0px;
 }
 
-.scroll-text span {
-  display: inline-block;
-}
-.margin-transition {
-  animation-name: animate-margin;
-  animation-duration: 5s;
-  animation-timing-function: linear;
-  animation-delay: 0s;
-  animation-iteration-count: 1;
-  animation-direction: normal;
-  animation-fill-mode: none;
-  animation-play-state: running;
+@keyframes marquee {
+  0% { transform: translate(0, 0);}
+  100% { transform: translate(-50%, 0);}
 }
 
-@keyframes animate-margin {
-  0% { margin-left: 0; }
-  100% { margin-left: var(--animation-margin); }
-}
 </style>

@@ -15,13 +15,8 @@ export default {
       default: 200,
     },
   },
-  data() {
-    return {
-    };
-  },
   mounted() {
     var minBreakTime = 2000;
-
     var children = this.$children.filter((child) => { return child.$options.name === 'ScrollText'});
     var highestDuration = 0;
     children.forEach((c) => {
@@ -39,18 +34,8 @@ export default {
         var breakTime = minBreakTime + (diff * 1000);
         c.startScrolling(breakTime, this.speed);
       });
-    }, 2000)
-
-
-  },
-  methods: {
-
+    }, minBreakTime);
   }
 }
 
-
 </script>
-
-<style scoped>
-
-</style>

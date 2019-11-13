@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <SyncScrollText :speed="100" class="scroll-text-container">
+    <SyncScrollText :speed="150" class="scroll-text-container">
       <ScrollText text="Soundtrack with a long name, feat. Leila Adu" class="song-name"/>
       <ScrollText text="Artist with a very long, looooong name, Alan Walker, Gen Hoshino" class="artist-name"/>
     </SyncScrollText>
@@ -33,20 +33,21 @@ html, body {
 }
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  font-size: 24px;
+  font-size: 28px;
+  line-height: 1em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #000000;
   margin-left: 10px;
-  width: 554px;
-  height: 401px;
+  width: 590px;
+  height: 455px;
   background-image: url('/background.png');
 }
 .scroll-text-container {
   position: relative;
-  margin-left: 35px;
-  margin-right: 120px;
-  padding-top: 30px;
+  margin-left: 40px;
+  margin-right: 140px;
+  padding-top: 56px;
 }
 
 .song-name {

@@ -1,7 +1,7 @@
 # Scrolling Text
 
-Text scrollers which are in sync, similar to the Apple Music app. [Example Video](apple-music-scrolling.mp4)
+![preview](preview.gif)
+
+Text scrollers which are in sync, inspired by the Apple Music app. [Comparison Video](comparison-native-web.mp4)
 
 Implemented with Vue.js, CSS variables and CSS animations.
-
-![preview](preview.gif)
